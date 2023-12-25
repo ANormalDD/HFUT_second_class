@@ -1,64 +1,101 @@
-import mitmproxy
+import requests
 import json
-from datetime import datetime
-class ModifyResponse:
-    time = 0
-    def logerr(str) :
-        print("\033[91m"+str+"\033[0m")
+import time
+import os
 
-    def logtxt(str):
-        print("\033[42m"+str+"\033[0m")
+file = open("user.txt","r")
+secret = file.readline().replace('\n',"")
+key_session = file.readline()
+file.close()
+print(secret)
+print(key_session)
+page_headers = {
+    "Host": "dekt.hfut.edu.cn",
+    "Connection": "keep-alive",
+    "key_session": key_session,
+    "xweb_xhr": "1",
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 MicroMessenger/7.0.20.1781(0x6700143B) NetType/WIFI MiniProgramEnv/Windows WindowsWechat/WMPF WindowsWechat(0x63090819)XWEB/8519",
+    "Content-Type": "application/json",
+    "Accept": "*/*",
+    "Accept-Language": "*",
+    "Sec-Fetch-Site": "cross-site",
+    "Sec-Fetch-Mode": "cors",
+    "Sec-Fetch-Dest": "empty",
+    "Referer": "https://servicewechat.com/wx1e3feaf804330562/91/page-frame.html",
+    "Accept-Encoding": "gzip, deflate, br"
+}
 
-    def logstart(str):
-        print("\033[33m"+str+"\033[0m")
-    def dump(data):
-        with open("1"+datetime.now().strftime("%Y-%m-%d-%H-%M-%S")+".json","w") as f: 
-            json.dump(data, f, indent=4)
-    def response(self, flow: mitmproxy.http.HTTPFlow):
-        global time
-        # 检查响应的 Content-Type 是否为 JSON
-        if flow.request.url.startswith("https://dekt.hfut.edu.cn/scReports/api/wx/netlearning/") and "page" not in flow.request.url and "filter/condition" not in flow.request.url and "questions" not in flow.request.url:
-            if "application/json" in flow.response.headers.get("Content-Type", ""):
-                # 解析原始的JSON响应
-                data = json.loads(flow.response.get_text())
-                if(data["data"]["category"]=="0"):
-                    if("articleQueSt" in data["data"]):
-                        ModifyResponse.logtxt("origin:articleQueSt"+str(data["data"]["articleQueSt"]))
-                        data["data"]["articleQueSt"] = 0
-                        data["data"]["contents"] = data["data"]["content"]
-                        data["data"]["content"] = "<p> simplified </p>"
-                    else :
-                    #  time=time+1
-                        ModifyResponse.dump(data)
-                        ModifyResponse.logerr("need to updata")
-                else:
-                    data["data"]["category"]="0"
-                    ModifyResponse.logtxt("Original type is video(https://dekt.hfut.edu.cn/"+data['data']['videoUrl']+")"+".The program have changed it to paragragh")
-                    data['data']['videoUrl']=""
-                    data["data"]["articleQueSt"] = 0
-                    data["data"]["content"] = "<p> fuck it </p>"
-                flow.response.set_text(json.dumps(data))
-        if flow.request.url.startswith("https://dekt.hfut.edu.cn/scReports/api/wx/netlearning/questions/"):
-            if "application/json" in flow.response.headers.get("Content-Type", ""):
-                data = json.loads(flow.response.get_text())
-                #ModifyResponse.dump(data)
-                if(data['data']['questions']):
-                    ModifyResponse.logtxt("origin answerSec"+str(data['data']['questions'][0]['answerSec']))
-                    data['data']['questions'][0]['answerSec'] = 999
-                    data['data']['showSec'] = -1
-                else: ModifyResponse.logtxt("No question")
-                flow.response.set_text(json.dumps(data))
-                #ModifyResponse.dump(data)
-        if flow.request.url.startswith("https://dekt.hfut.edu.cn/scReports/api/wx/netlearning/page/"):
-            ModifyResponse.logtxt("page")
-            if "application/json" in flow.response.headers.get("Content-Type", ""):
-                #odifyResponse.logtxt("in")
-                data = json.loads(flow.response.get_text())
-                for i in data['data']['list'] :
-                    #ModifyResponse.logtxt(i['category'])
-                    i['category'] = "0"
-                flow.response.set_text(json.dumps(data))
+question_headers = {
+    "Host": "dekt.hfut.edu.cn",
+    "Connection": "keep-alive",
+    "secret": secret,
+    "key_session": key_session,
+    "xweb_xhr": "1",
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 MicroMessenger/7.0.20.1781(0x6700143B) NetType/WIFI MiniProgramEnv/Windows WindowsWechat/WMPF WindowsWechat(0x63090819)XWEB/8519",
+    "Content-Type": "application/json",
+    "Accept": "*/*",
+    "Accept-Language": "*",
+    "Sec-Fetch-Site": "cross-site",
+    "Sec-Fetch-Mode": "cors",
+    "Sec-Fetch-Dest": "empty",
+    "Referer": "https://servicewechat.com/wx1e3feaf804330562/91/page-frame.html",
+    "Accept-Encoding": "gzip, deflate, br"
+}
 
-addons = [
-    ModifyResponse()
-]
+answer_headers = {
+    "Host": "dekt.hfut.edu.cn",
+    "Connection": "keep-alive",
+    "key_session": key_session,
+    "xweb_xhr": "1",
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 MicroMessenger/7.0.20.1781(0x6700143B) NetType/WIFI MiniProgramEnv/Windows WindowsWechat/WMPF WindowsWechat(0x63090819)XWEB/8519",
+    "Content-Type": "application/json",
+    "Accept": "*/*",
+    "Accept-Language": "*",
+    "Sec-Fetch-Site": "cross-site",
+    "Sec-Fetch-Mode": "cors",
+    "Sec-Fetch-Dest": "empty",
+    "Referer": "https://servicewechat.com/wx1e3feaf804330562/91/page-frame.html",
+    "Accept-Encoding": "gzip, deflate, br"
+}
+
+data = {
+    "category": "",
+    "columnType": "0"
+}
+for page_num in range(1, 36):
+
+    url = f"https://dekt.hfut.edu.cn/scReports/api/wx/netlearning/page/{page_num}/10"
+    response = requests.post(url, headers=page_headers, data=json.dumps(data))
+    page_data = response.json()
+
+    for question in page_data["data"]["list"]:
+
+        if (question["correct"] == "已完成"):
+            continue
+
+        question_id = question["id"]
+        url = f"https://dekt.hfut.edu.cn/scReports/api/wx/netlearning/questions/{question_id}"
+        time.sleep(1)
+        response = requests.get(url, headers=question_headers)
+        question_detail = response.json()
+
+        if(("data" not in question_detail) or ("questions" not in question_detail["data"]) or ()):
+            continue
+        if(question_detail["data"]["todayReach"]):
+            exit() #达到每日上限
+        for question in question_detail["data"]["questions"]:
+
+            if(question["queType"]): #只做单选题
+                continue
+            sbid = question["id"]
+
+            for option in question["optionList"]:
+
+                option_id = option["id"]
+                url = f"https://dekt.hfut.edu.cn/scReports/api/wx/netlearning/answer/{sbid}"
+                time.sleep(1)
+                data = [option_id]
+                response = requests.post(url, headers=answer_headers, json=data)
+                recv_data = response.json()
+                if recv_data["data"]["desc"] == "恭喜,获得积分":
+                    break
