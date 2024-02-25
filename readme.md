@@ -28,6 +28,8 @@ python>=3.6
     python main.py
 
 注意，本方案只做单选题，虽然够用就是了
+
+[教程视频](https://www.bilibili.com/video/BV1hr421s7DW)
 # Q&A
 Q1:我看不到文章怎么答题
 
