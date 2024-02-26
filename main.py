@@ -60,19 +60,20 @@ answer_headers = {
 
 data = {
     "category": "",
-    "columnType": "0"
+    "columnType": "99"
 }
 for page_num in range(1, 36):
-
+    print("page:"+str(page_num)+"\n")
     url = f"https://dekt.hfut.edu.cn/scReports/api/wx/netlearning/page/{page_num}/10"
     response = requests.post(url, headers=page_headers, data=json.dumps(data))
+   # print(response.content)
     page_data = response.json()
-
+    #print(page_data)
     for question in page_data["data"]["list"]:
-
+        #print(question['title']+":")
         if (question["correct"] == "已完成"):
             continue
-
+        #print("reach A")
         question_id = question["id"]
         url = f"https://dekt.hfut.edu.cn/scReports/api/wx/netlearning/questions/{question_id}"
         time.sleep(1)
@@ -81,12 +82,14 @@ for page_num in range(1, 36):
 
         if(("data" not in question_detail) or ("questions" not in question_detail["data"]) or ()):
             continue
+        #print("reach B")
         if(question_detail["data"]["todayReach"]):
             exit() #达到每日上限
         for question in question_detail["data"]["questions"]:
-
+            #print("reach C")
             if(question["queType"]): #只做单选题
                 continue
+            #print("reach D")
             sbid = question["id"]
 
             for option in question["optionList"]:
@@ -98,4 +101,5 @@ for page_num in range(1, 36):
                 response = requests.post(url, headers=answer_headers, json=data)
                 recv_data = response.json()
                 if recv_data["data"]["desc"] == "恭喜,获得积分":
+                    print("+1\n")
                     break
