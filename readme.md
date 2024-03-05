@@ -29,7 +29,6 @@ python>=3.6
 
 注意，本方案只做单选题，虽然够用就是了
 
-[教程视频](https://www.bilibili.com/video/BV1hr421s7DW)
 # Q&A
 Q1:我看不到文章怎么答题
 
@@ -64,11 +63,8 @@ Q7:已经结束嘞！搞不到那么多分了
 
 Q8:其他问题
 
-    发issue或者直接发我邮箱
+    发issue
 
-# 联系方式
-
-nosuggestion@foxmail.com（遗憾的是我基本不看邮箱，除非我的e5快过期了（已经要过期了））
 
 # 后言
 
