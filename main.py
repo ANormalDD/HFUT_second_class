@@ -9,6 +9,7 @@ key_session = file.readline()
 file.close()
 print(secret)
 print(key_session)
+
 page_headers = {
     "Host": "dekt.hfut.edu.cn",
     "Connection": "keep-alive",
@@ -62,11 +63,20 @@ data = {
     "category": "",
     "columnType": "99"
 }
-for page_num in range(1, 36):
+
+page_num = 1
+
+if(os.path.exists("last.txt")):
+    file = open("last.txt","r")
+    tmp = file.readline().replace('\n','')
+    page_num = int(tmp)
+
+while page_num <= 100 :
+    
     print("page:"+str(page_num)+"\n")
     url = f"https://dekt.hfut.edu.cn/scReports/api/wx/netlearning/page/{page_num}/10"
     response = requests.post(url, headers=page_headers, data=json.dumps(data))
-   # print(response.content)
+    #print(response.content)
     page_data = response.json()
     #print(page_data)
     for question in page_data["data"]["list"]:
@@ -103,3 +113,5 @@ for page_num in range(1, 36):
                 if recv_data["data"]["desc"] == "恭喜,获得积分":
                     print("+1\n")
                     break
+file = open("last.txt","w")
+file.write(page_num)
