@@ -94,6 +94,8 @@ while page_num <= 100 :
             continue
         #print("reach B")
         if(question_detail["data"]["todayReach"]):
+            file = open("last.txt","w")
+            file.write(str(page_num))
             exit() #达到每日上限
         for question in question_detail["data"]["questions"]:
             #print("reach C")
