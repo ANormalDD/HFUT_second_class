@@ -78,6 +78,7 @@ while page_num <= 100 :
     response = requests.post(url, headers=page_headers, data=json.dumps(data))
     #print(response.content)
     page_data = response.json()
+    page_num += 1
     #print(page_data)
     for question in page_data["data"]["list"]:
         #print(question['title']+":")
